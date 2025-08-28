@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import type React from "react";
@@ -10,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Send, X, Plus } from "lucide-react";
 import z from "zod";
 
-const emailSchema = z.email();
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailComponent() {
   const [emails, setEmails] = useState<string[]>([]);
@@ -18,11 +19,18 @@ export function EmailComponent() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const addRecipient = () => {
-    if (emailInput.trim() && !emails.find((r) => r === emailInput.trim())) {
-      setEmails([...emails, emailInput]);
-      setEmailInput("");
+    const email = emailInput.trim();
+    if (emailRegex.test(email)) {
+      if (emailInput.trim() && !emails.find((r) => r === emailInput.trim())) {
+        setEmails([...emails, emailInput]);
+        setEmailInput("");
+      }
+    } else {
+      console.error("Invalid email:", emailInput);
     }
   };
 
@@ -33,28 +41,42 @@ export function EmailComponent() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      const result = emailSchema.safeParse(emailInput.trim());
-      if (result.success) {
-        addRecipient();
-      } else {
-        console.error("Invalid email:", emailInput);
-      }
+      addRecipient();
     }
   };
 
   const handleSend = async () => {
     setIsLoading(true);
-    // Simulate sending email
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsLoading(false);
-
-    // Reset form
-    setEmails([]);
-    setSubject("");
-    setMessage("");
-
-    // Show success message (you could add a toast here)
-    alert("Email sent successfully!");
+    setErrorMessage(null);
+    setSubmitMessage(null);
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject: subject,
+          emails: emails,
+          message: message,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubmitMessage(
+          "Message submitted successfully! I will get back to you within 24 hours."
+        );
+        setEmails([]);
+        setSubject("");
+        setMessage("");
+      } else {
+        setErrorMessage(data.message || "Failed to submit message");
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || "Failed to submit message");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,6 +87,21 @@ export function EmailComponent() {
           Email Messaging System
         </div>
       </div>
+
+      {submitMessage && (
+        <div
+          className={`font-medium tracking-wider py-3  text-sm  text-[#0b7e28] `}
+        >
+          {submitMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div
+          className={`font-medium tracking-wider py-3  text-sm  text-[#7E110B] `}
+        >
+          {errorMessage}
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Recipients Section */}
@@ -137,7 +174,7 @@ export function EmailComponent() {
             placeholder="Type your message here..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="min-h-[200px] mt-2 rounded-none"
+            className="min-h-[100px] mt-2 rounded-none"
             rows={8}
           />
         </div>

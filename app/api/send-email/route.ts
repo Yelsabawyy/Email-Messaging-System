@@ -3,8 +3,16 @@ import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
   try {
-    const { subject, emails, message } = await req.json();
-    if (!subject || !emails || emails.length === 0 || !message) {
+    const { subject, emails, message, yourEmail, smtpPassword } =
+      await req.json();
+    if (
+      !subject ||
+      !emails ||
+      emails.length === 0 ||
+      !message ||
+      !yourEmail ||
+      !smtpPassword
+    ) {
       return NextResponse.json(
         { message: "All fields are required" },
         { status: 400 }
@@ -14,14 +22,14 @@ export async function POST(req: Request) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: yourEmail,
+        pass: smtpPassword,
       },
     });
 
     for (const email of emails) {
       await transporter.sendMail({
-        from: `"Website Contact Form" <${process.env.EMAIL_USER}>`,
+        from: `<${process.env.EMAIL_USER}>`,
         to: email,
         subject,
         text: message,

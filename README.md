@@ -16,13 +16,6 @@ First, install dependencies:
 npm install
 ```
 
-Set up your environment variables in `.env.local`:
-
-```
-EMAIL_USER=your_gmail_address@gmail.com
-EMAIL_PASS=your_gmail_app_password
-```
-
 Run the development server:
 
 ```bash

@@ -9,15 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Send, X, Plus } from "lucide-react";
-import z from "zod";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailComponent() {
   const [emails, setEmails] = useState<string[]>([]);
+  
   const [emailInput, setEmailInput] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

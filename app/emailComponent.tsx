@@ -14,7 +14,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailComponent() {
   const [emails, setEmails] = useState<string[]>([]);
-  
+
   const [emailInput, setEmailInput] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -23,7 +23,7 @@ export function EmailComponent() {
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const addRecipient = () => {
+  const addEmail = () => {
     const email = emailInput.trim();
     if (emailRegex.test(email)) {
       if (emailInput.trim() && !emails.find((r) => r === emailInput.trim())) {
@@ -42,7 +42,7 @@ export function EmailComponent() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      addRecipient();
+      addEmail();
     }
   };
 
@@ -82,13 +82,6 @@ export function EmailComponent() {
 
   return (
     <div className="w-full  border-1 border-gray-300 rounded-none p-5">
-      <div className="pb-4">
-        <div className="text-3xl font-semibold text-div-foreground flex items-center gap-3">
-          <Send fill="black" color="black" className="h-5 w-5 text-accent" />
-          Email Messaging System
-        </div>
-      </div>
-
       {submitMessage && (
         <div
           className={`font-medium tracking-wider py-3  text-sm  text-[#0b7e28] `}
@@ -105,7 +98,29 @@ export function EmailComponent() {
       )}
 
       <div className="space-y-6">
-        {/* Recipients Section */}
+
+        <div className="space-y-2 mt-2">
+          <label className="text-sm font-medium text-div-foreground">
+            Email:
+          </label>
+          <Input
+            placeholder="Enter subject here..."
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="rounded-none mt-2"
+          />
+        </div>
+        <div className="space-y-2 mt-2">
+          <label className="text-sm font-medium text-div-foreground">
+            STMP Password:
+          </label>
+          <Input
+            placeholder="Enter subject here..."
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="rounded-none mt-2"
+          />
+        </div>
         <div className="space-y-5">
           <label className="text-sm font-medium text-div-foreground">To:</label>
 
@@ -116,7 +131,7 @@ export function EmailComponent() {
                 <Badge
                   key={email}
                   variant="secondary"
-                  className="cursor-pointer flex items-center gap-1 px-3 py-1 text-white bg-black"
+                  className="cursor-pointer flex items-center gap-1 px-3 py-1 text-white bg-[#1A1A5D]"
                 >
                   <span className="text-sm">{email}</span>
                   <button
@@ -140,7 +155,7 @@ export function EmailComponent() {
               className="flex-1 rounded-none "
             />
             <Button
-              onClick={addRecipient}
+              onClick={addEmail}
               variant="outline"
               size="icon"
               className="cursor-pointer border-border  bg-transparent rounded-none"
@@ -149,7 +164,6 @@ export function EmailComponent() {
             </Button>
           </div>
         </div>
-
         {/* Subject Section */}
         <div className="space-y-2 mt-2">
           <label className="text-sm font-medium text-div-foreground">
@@ -162,7 +176,6 @@ export function EmailComponent() {
             className="rounded-none mt-2"
           />
         </div>
-
         {/* Message Section */}
         <div className="space-y-5">
           <div className="flex items-center justify-between">
@@ -179,7 +192,6 @@ export function EmailComponent() {
             rows={8}
           />
         </div>
-
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-2">
           <div className="text-sm text-muted-foreground">
